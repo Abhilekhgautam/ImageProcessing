@@ -14,10 +14,11 @@ namespace fs = std::filesystem;
 void display_msb_contribution(cv::Mat mat){
   const char* window_name = "MSB Contribution";
   // manipulatation logic
-
-  cv::MatIterator_<char> it, end;
-  for(it = mat.begin<char>(), end = mat.end<char>() ;  it != end ; ++it){
-    *it = *it >> 7; 	  
+  mat.convertTo(mat, CV_8U);
+ 
+  cv::MatIterator_<uchar> it, end;
+  for(it = mat.begin<uchar>(), end = mat.end<uchar>() ;  it != end ; ++it){
+    *it = *it >> 7 ? 255 : 0; 	  
   }
 
   cv::imshow(window_name, mat);
@@ -26,14 +27,15 @@ void display_msb_contribution(cv::Mat mat){
 
 void display_msb_min_1_contribution(cv::Mat mat){
   const char* window_name = "MSB - 1 Contribution";
+  mat.convertTo(mat, CV_8U);
   // manipulatation logic
-
   cv::MatIterator_<uchar> it, end;
   for(it = mat.begin<uchar>(), end = mat.end<uchar>() ;  it != end ; ++it){
-    *it = (*it & 0x40) >> 6; 
+    *it = (*(it) & 0x40) >> 6 ? 255 : 0;
   }
   cv::imshow(window_name, mat);
   cv::waitKey(0);
+
 }
 void display_msb_min_2_contribution(cv::Mat mat){
   const char* window_name = "MSB - 2 Contribution";
@@ -41,10 +43,11 @@ void display_msb_min_2_contribution(cv::Mat mat){
 
   cv::MatIterator_<uchar> it, end;
   for(it = mat.begin<uchar>(), end = mat.end<uchar>() ;  it != end ; ++it){
-    *it = (*it & 0x20) >> 5; 
+    *it = (*it & 0x20) >> 5 ? 255 : 0; 
   }
   cv::imshow(window_name, mat);
   cv::waitKey(0);
+
 }
 
 void display_msb_min_3_contribution(cv::Mat mat){
@@ -53,7 +56,7 @@ void display_msb_min_3_contribution(cv::Mat mat){
 
   cv::MatIterator_<uchar> it, end;
   for(it = mat.begin<uchar>(), end = mat.end<uchar>() ;  it != end ; ++it){
-    *it = (*it & 0x10) >> 4; 
+    *it = (*it & 0x10) >> 4 ? 255 : 0 ; 
   }
   cv::imshow(window_name, mat);
   cv::waitKey(0);
@@ -65,10 +68,11 @@ void display_msb_min_4_contribution(cv::Mat mat){
 
   cv::MatIterator_<uchar> it, end;
   for(it = mat.begin<uchar>(), end = mat.end<uchar>() ;  it != end ; ++it){
-    *it = (*it & 0x08) >> 3; 
+    *it = (*it & 0x08) >> 3 ? 255 : 0; 
   }
   cv::imshow(window_name, mat);
   cv::waitKey(0);
+
 }
 
 void display_msb_min_5_contribution(cv::Mat mat){
@@ -77,10 +81,11 @@ void display_msb_min_5_contribution(cv::Mat mat){
 
   cv::MatIterator_<uchar> it, end;
   for(it = mat.begin<uchar>(), end = mat.end<uchar>() ;  it != end ; ++it){
-    *it = (*it & 0x04) >> 2; 
+    *it = (*it & 0x04) >> 2 ? 255 : 0; 
   }
   cv::imshow(window_name, mat);
   cv::waitKey(0);
+
 }
 
 void display_msb_min_6_contribution(cv::Mat mat){
@@ -89,10 +94,11 @@ void display_msb_min_6_contribution(cv::Mat mat){
 
   cv::MatIterator_<uchar> it, end;
   for(it = mat.begin<uchar>(), end = mat.end<uchar>() ;  it != end ; ++it){
-    *it = (*it & 0x02) >> 1; 
+    *it = (*it & 0x02) >> 1 ? 255 : 0; 
   }
   cv::imshow(window_name, mat);
   cv::waitKey(0);
+
 }
 
 
@@ -102,10 +108,11 @@ void display_lsb_contribution(cv::Mat mat){
 
   cv::MatIterator_<uchar> it, end;
   for(it = mat.begin<uchar>(), end = mat.end<uchar>() ;  it != end ; ++it){
-    *it = *it << 7; 
+    *it = (*it & 0x01) ? 255 : 0; 
   }
   cv::imshow(window_name, mat);
   cv::waitKey(0);
+
 }
 
 
@@ -124,16 +131,18 @@ int main(int argc, char** argv){
  
  const char original_image_window[] = "Orginal Window";
  cv::Mat org_image = cv::imread(argv[1], cv::IMREAD_GRAYSCALE);
+ cv::Mat org_image_copy = org_image.clone();
  cv::imshow(original_image_window, org_image);
- 
- display_msb_contribution(org_image);
- display_msb_min_1_contribution(org_image);
- display_msb_min_2_contribution(org_image);
- display_msb_min_3_contribution(org_image);
- display_msb_min_4_contribution(org_image);
- //display_lsb_contribution(org_image);
  cv::waitKey(0);
 
+ display_msb_contribution(org_image_copy.clone());
+ display_msb_min_1_contribution(org_image_copy.clone());
+ display_msb_min_2_contribution(org_image_copy.clone());
+ display_msb_min_3_contribution(org_image_copy.clone());
+ display_msb_min_4_contribution(org_image_copy.clone());
+ display_msb_min_5_contribution(org_image_copy.clone());
+ display_msb_min_6_contribution(org_image_copy.clone());
+ display_lsb_contribution(org_image_copy.clone());
 
  return 0; //happy compiler
 }
