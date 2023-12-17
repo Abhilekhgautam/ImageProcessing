@@ -13,14 +13,26 @@
 #include <array>
 namespace fs = std::filesystem;
 
-const int width = 256;
-const int height = 800;
+const int width = 255 * 2;
+const int height = 510;
 
 //plots the Histogram for given frequencies.
 void plotHistogram(const std::array<int, 256>& counts){
  cv::Mat histogram = cv::Mat::zeros(height, width, CV_8UC3);
+ auto max = std::max_element(counts.begin(), counts.end());
+ int maxVal = *max;
+ std::cout << "Max:" << maxVal;
+ float factor = (float) height / (float) maxVal;
+ std::cout << factor << '\n';
  for(int i = 0 ; i < 256; ++i){
-   cv::line(histogram, cv::Point(i, height),cv::Point(i, height -(counts[i]) % height), cv::Scalar_<int>(0, 0, 255));	 
+   
+   //debugging stuff
+   std::cout << "(" << i << ", " << height << ")" << " and " << "(" << i << "," <<  ( height - factor * counts[i])  << ")" << '\n';
+   // this is a bug, leaving here so that you won't do this again
+   // we are trying to fit in numbers from 0 to max Frequency to range 0 to height and that is kinda freaking right?
+   //cv::line(histogram, cv::Point(i , height),cv::Point(i , height - (counts[i]) % height), cv::Scalar_<int>(0, 0, 255));
+   cv::line(histogram, cv::Point(i * 2 , height),cv::Point(i * 2 ,  ( height - (factor * counts[i]))), cv::Scalar_<int>(0, 0, 255));
+
  }
  cv::imshow("Histogram", histogram);
  cv::waitKey(0);
@@ -33,6 +45,7 @@ int main(int argc, char** argv){
   }
   if(!fs::exists(argv[1])){
     std::cerr << "Error: " << argv[1] << " : No such file exists";	  
+    std::exit(1);
   }
   std::array<int, 256> counts;
   counts.fill(0);
@@ -40,14 +53,15 @@ int main(int argc, char** argv){
   const char window_name[] = "Source Image";
 
   //cv::imshow(window_name, img);
-
+  //cv::waitKey(0);
    cv::MatIterator_<uchar> It, end;
    for(It = img.begin<uchar>(), end = img.end<uchar>(); It != end ; ++It){
       counts[*It] = counts[*It] + 1;	   
    }
-
+   int count = 0;
    for(auto elt: counts){
-      std::cout << elt << '\n';	   
+      std::cout << count << ": " << elt << '\n';
+      count++;
    }
    //auto add = [](const int& a, const int& b){return a + b;};
    //auto val = std::accumulate(counts.begin(), counts.end(), 0, add);
